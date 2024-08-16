@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
-app.use(express.json());
+app.use(cors());
 
 let notes = [
     {
@@ -21,15 +22,20 @@ let notes = [
     },
 ];
 
-app.get('/api/notes/:id', (req, res) => {
-    const id = req.params.id;
-    const note = notes.find((note) => note.id === id);
-    if (note) {
-        res.json(note);
-    } else {
-        res.status(404).end();
-    }
-});
+const requestLogger = (req, res, next) => {
+    console.log('Method', req.method);
+    console.log('Path:  ', req.path);
+    console.log('Body:  ', req.body);
+    console.log('---');
+    next();
+};
+
+app.use(express.json());
+app.use(requestLogger);
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' });
+};
 
 app.get('/', (req, res) => {
     res.send('<h1>Hellp World!</h1>');
@@ -37,13 +43,6 @@ app.get('/', (req, res) => {
 
 app.get('/api/notes', (req, res) => {
     res.json(notes);
-});
-
-app.delete('/api/notes/:id', (req, res) => {
-    const id = req.params.id;
-    notes = notes.filter((note) => note.id !== id);
-
-    res.status(204).end();
 });
 
 const generateId = () => {
@@ -60,16 +59,35 @@ app.post('/api/notes', (request, response) => {
         });
     }
 
-    const note = {
+    const newNote = {
         content: body.content,
         important: body.important || false,
         id: generateId(),
     };
 
-    notes = notes.concat(note);
+    notes = notes.concat(newNote);
 
-    response.json(note);
+    response.json(newNote);
 });
+
+app.get('/api/notes/:id', (req, res) => {
+    const id = req.params.id;
+    const note = notes.find((note) => note.id === id);
+    if (note) {
+        res.json(note);
+    } else {
+        res.status(404).end();
+    }
+});
+
+app.delete('/api/notes/:id', (req, res) => {
+    const id = req.params.id;
+    notes = notes.filter((note) => note.id !== id);
+
+    res.status(204).end();
+});
+
+app.use(unknownEndpoint);
 
 const PORT = 3001;
 app.listen(PORT, () => {

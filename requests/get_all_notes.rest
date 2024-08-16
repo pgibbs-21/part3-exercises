@@ -12,3 +12,6 @@ Content-Type: application/json
     
 }
 
+### 
+
+DELETE http://localhost:3001/api/2
