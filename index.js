@@ -61,7 +61,6 @@ const generateId = () => {
 
 app.post('/api/persons/', (req, res) => {
     const { name, number } = req.body;
-    console.log(req.body);
 
     if (!name || !number) {
         return res.status(400).json({ error: 'name or number is missing' });
@@ -80,6 +79,9 @@ app.post('/api/persons/', (req, res) => {
     };
 
     persons = persons.concat(newPerson);
+
+    ;console.log('New person created:', newPerson);
+    
 
     res.json(persons);
 });
