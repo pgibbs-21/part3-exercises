@@ -80,8 +80,7 @@ app.post('/api/persons/', (req, res) => {
 
     persons = persons.concat(newPerson);
 
-    ;console.log('New person created:', newPerson);
-    
+    console.log('New person created:', newPerson);
 
     res.json(persons);
 });
