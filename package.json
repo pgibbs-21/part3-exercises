@@ -5,7 +5,9 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node index.js",
-        "dev": "nodemon index.js"
+        "dev": "nodemon index.js",
+        "build:ui": "rimraf dist && cd C:/Users/patri/Boot Camp/full-stack-open/doOverPart2/part2-final-version && npm run build && copyfiles -u 1 'C:/Users/patri/Boot Camp/full-stack-open/doOverPart2/part2-final-version/dist/**/*' './dist'",
+        "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
     },
     "author": "Patrick Gibbs",
     "license": "ISC",
@@ -16,6 +18,8 @@
         "morgan": "^1.10.0"
     },
     "devDependencies": {
-        "nodemon": "^3.1.4"
+        "copyfiles": "^2.4.1",
+        "nodemon": "^3.1.4",
+        "rimraf": "^6.0.1"
     }
 }
