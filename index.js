@@ -82,7 +82,7 @@ app.post('/api/persons/', (req, res) => {
 
     console.log('New person created:', newPerson);
 
-    res.json(persons);
+    res.json(newPerson);
 });
 
 app.delete('/api/persons/:id', (req, res) => {
