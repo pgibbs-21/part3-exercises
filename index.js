@@ -36,14 +36,14 @@ app.get('/info', (req, res) => {
     const currentDate = new Date();
 
     res.send(
-        `Phonebook has info for ${persons.length} people<br>` +
+        `Phonebook has info for ${Person.length} people<br>` +
             `${currentDate.toString()}`
     );
 });
 
 app.get('/api/persons/:id', (req, res) => {
     const id = req.params.id;
-    const person = persons.find((person) => person.id === id);
+    const person = person.find((person) => person.id === id);
     if (person) {
         res.json(person);
     } else {
@@ -51,34 +51,43 @@ app.get('/api/persons/:id', (req, res) => {
     }
 });
 
-app.post('/api/persons/', (req, res) => {
+app.post('/api/persons/', async (req, res) => {
     const { name, number } = req.body;
 
+    // Validate that the name and number fields are present
     if (!name || !number) {
-        return res.status(400).json({ error: 'name or number is missing' });
+        return res.status(400).json({ error: 'Name or number is missing' });
     }
 
-    const nameExists = persons.some((person) => person.name === name);
+    try {
+        // Check if a person with the same name already exists in the database
+        const nameExists = await Person.findOne({ name });
+        if (nameExists) {
+            return res.status(400).json({ error: 'Name must be unique' });
+        }
 
-    if (nameExists) {
-        return res.status(400).json({ error: 'Name must be unique' });
+        // Create a new Person instance
+        const newPerson = new Person({
+            name,
+            number,
+        });
+
+        // Save the new person to MongoDB
+        const savedPerson = await newPerson.save();
+
+        // Send the saved person as a JSON response
+        res.json(savedPerson);
+    } catch (error) {
+        console.error('Error saving person:', error);
+        res.status(500).json({
+            error: 'An error occurred while saving the person',
+        });
     }
-
-    const newPerson = {
-        name,
-        number,
-    };
-
-    persons = persons.concat(newPerson);
-
-    console.log('New person created:', newPerson);
-
-    res.json(newPerson);
 });
 
 app.delete('/api/persons/:id', (req, res) => {
     const id = req.params.id;
-    persons = persons.filter((person) => person.id !== id);
+    Person = Person.filter((person) => person.id !== id);
 
     res.status(204).end();
 });
