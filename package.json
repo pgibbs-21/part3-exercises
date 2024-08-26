@@ -7,7 +7,8 @@
         "start": "node index.js",
         "dev": "nodemon index.js",
         "build:ui": "rimraf dist && cd C:/Users/patri/Boot Camp/full-stack-open/doOverPart2/part2-final-version && npm run build && powershell -Command \"Copy-Item -Recurse -Force \\\"C:/Users/patri/Boot Camp/full-stack-open/doOverPart2/part2-final-version/dist\\\" \\\"C:/Users/patri/Boot Camp/full-stack-open/part3/part3-exercises\\\"\"",
-        "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+        "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+        "lint": "eslint ."
     },
     "author": "Patrick Gibbs",
     "license": "ISC",
@@ -20,7 +21,11 @@
         "morgan": "^1.10.0"
     },
     "devDependencies": {
+        "@eslint/js": "^9.9.1",
+        "@stylistic/eslint-plugin-js": "^2.6.4",
         "copyfiles": "^2.4.1",
+        "eslint": "^9.9.1",
+        "globals": "^15.9.0",
         "nodemon": "^3.1.4",
         "rimraf": "^6.0.1"
     }
