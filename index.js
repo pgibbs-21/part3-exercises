@@ -32,15 +32,6 @@ app.get('/api/persons', async (req, res) => {
     }
 });
 
-app.get('/info', (req, res) => {
-    const currentDate = new Date();
-
-    res.send(
-        `Phonebook has info for ${Person.length} people<br>` +
-            `${currentDate.toString()}`
-    );
-});
-
 app.get('/api/persons/:id', (req, res) => {
     const id = req.params.id;
     const person = person.find((person) => person.id === id);
@@ -85,11 +76,15 @@ app.post('/api/persons/', async (req, res) => {
     }
 });
 
-app.delete('/api/persons/:id', (req, res) => {
-    const id = req.params.id;
-    Person = Person.filter((person) => person.id !== id);
-
-    res.status(204).end();
+app.delete('/api/persons/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const person = await Person.findByIdAndDelete(id);
+        res.status(204).end();
+    } catch (error) {
+        console.error('Error deleting person', error);
+        res.status(404).end();
+    }
 });
 
 const PORT = process.env.PORT;
