@@ -32,15 +32,49 @@ app.get('/api/persons', async (req, res) => {
     }
 });
 
-app.get('/api/persons/:id', (req, res) => {
-    const id = req.params.id;
-    const person = person.find((person) => person.id === id);
-    if (person) {
-        res.json(person);
-    } else {
-        res.status(404).end();
+app.get('/api/persons/info', async (req, res) => {
+    try {
+        const now = new Date();
+        const persons = await Person.find({});
+        // Convert the current date to a readable string
+        const dateString = now.toString();
+
+        // Send HTML content in the response
+        res.send(`
+            <html>
+                <body>
+                    <p>Phonebook has info for ${persons.length} people</p>
+                    <p>${dateString}</p>
+                </body>
+            </html>
+        `);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: 'An error occurred while fetching the phonebook',
+        });
     }
 });
+
+app.get('/api/persons/:id', async (req, res) => {
+    try {
+        const persons = await Person.find({});
+        const id = req.params.id;
+        const person = persons.find((person) => person.id === id);
+        if (person) {
+            res.json(person);
+        } else {
+            res.status(404).end();
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: 'An error occured while fetching the phonebook',
+        });
+    }
+});
+
+app.get('/api/persons/info', async (req, res) => {});
 
 app.post('/api/persons/', async (req, res) => {
     const { name, number } = req.body;
@@ -69,9 +103,40 @@ app.post('/api/persons/', async (req, res) => {
         // Send the saved person as a JSON response
         res.json(savedPerson);
     } catch (error) {
-        console.error('Error saving person:', error);
+        console.error('Error saving person:');
+        res.status(500).json({ error: 'Failed to save person' });
+    }
+});
+
+app.put('/api/persons/:id', async (req, res) => {
+    const id = req.params.id;
+    const { name, number } = req.body;
+
+    if (!name || name.length < 3) {
+        return res
+            .status(400)
+            .json({ error: 'Name must be at least 3 characters long' });
+    }
+    if (!number || number.length < 10 || !/\d{3}-\d{3}-\d{4}/.test(number)) {
+        return res.status(400).json({
+            error: 'Number must be in the format XXX-XXX-XXXX and at least 10 characters long',
+        });
+    }
+    try {
+        const person = await Person.findByIdAndUpdate(
+            id,
+            { name, number },
+            { new: true }
+        );
+        if (person) {
+            res.json(person);
+        } else {
+            res.status(404).end();
+        }
+    } catch (error) {
+        console.error('Error updating person:', error);
         res.status(500).json({
-            error: 'An error occurred while saving the person',
+            error: 'An error occurred while updating the person',
         });
     }
 });

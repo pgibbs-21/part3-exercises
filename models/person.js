@@ -28,8 +28,21 @@ connectToMongoDB();
 // Define schema for a phonebook entry
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+    name: {
+        type: String,
+        required: true,
+        minLength: 3,
+    },
+    number: {
+        type: String,
+        minLength: 10,
+        required: true,
+        validate: {
+            validator: function (v) {
+                return /\d{3}-\d{3}-\d{4}/.test(v);
+            },
+        },
+    },
 });
 
 // Customize JSON output of the Person model
